@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+dotnet build src/QlFmt.Cli -c Release -v q
+dotnet run --project src/QlFmt.Cli -c Release --no-build -- sample.sql --lexer --parser --format --stats

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QlFmt/QlFmt.csproj" />
+    <Project Path="src/QlFmt.Cli/QlFmt.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QlFmt.Tests/QlFmt.Tests.csproj" />
+  </Folder>
+</Solution>
