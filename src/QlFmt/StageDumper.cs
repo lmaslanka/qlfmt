@@ -248,6 +248,16 @@ internal static class StageDumper
                 dump.Append(' ');
                 AppendSpan(dump, source, identifier.Identifier);
                 break;
+            case EmbeddedHostExpression host:
+                dump.Append(nameof(EmbeddedHostExpression));
+                dump.Append(' ');
+                AppendSpan(dump, source, host.Name);
+                break;
+            case HostParameterExpression parameter:
+                dump.Append(nameof(HostParameterExpression));
+                dump.Append(' ');
+                AppendSpan(dump, source, parameter.QuestionMark);
+                break;
             case NiladicFunctionExpression niladic:
                 dump.Append(nameof(NiladicFunctionExpression));
                 dump.Append(' ');

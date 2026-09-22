@@ -8,7 +8,13 @@ public static class Sql
     public static string Format(string sql, bool color = false)
     {
         ArgumentNullException.ThrowIfNull(sql);
-        return Formatter.Format(QlParse.Sql.Parse(sql), color);
+        var parsed = QlParse.Sql.Parse(sql, SqlFlags.AtParameters);
+        if (parsed.Error is not null)
+        {
+            throw parsed.Error;
+        }
+
+        return Formatter.Format(parsed, color);
     }
 
     public static SqlTrace Trace(
@@ -21,7 +27,7 @@ public static class Sql
         ArgumentNullException.ThrowIfNull(sql);
         var total = stats ? Stopwatch.StartNew() : null;
         var lexerWatch = stats ? Stopwatch.StartNew() : null;
-        var lexed = QlParse.Sql.Lex(sql);
+        var lexed = QlParse.Sql.Lex(sql, SqlFlags.AtParameters);
         var lexerTime = lexerWatch?.Elapsed ?? TimeSpan.Zero;
         var tokenCount = stats ? CountTokens(lexed.Tokens) : 0;
         var comments = stats ? CountComments(lexed.Trivia) : 0;
@@ -53,14 +59,9 @@ public static class Sql
         if (dumpParser || format)
         {
             var parserWatch = stats ? Stopwatch.StartNew() : null;
-            try
-            {
-                statement = QlParse.Sql.Parse(lexed).Root;
-            }
-            catch (SqlParseException ex)
-            {
-                parseError = ex;
-            }
+            var parsed = QlParse.Sql.Parse(lexed);
+            statement = parsed.Root;
+            parseError = parsed.Error;
 
             parserTime = parserWatch?.Elapsed;
             if (parseError is not null || statement is null)
@@ -89,14 +90,13 @@ public static class Sql
         if (format && statement is not null)
         {
             var formatWatch = stats ? Stopwatch.StartNew() : null;
-            formatted = Formatter.Format(
-                new SqlSyntaxTree
-                {
-                    Source = sql,
-                    Root = statement,
-                    Tokens = lexed.Tokens,
-                    Trivia = lexed.Trivia,
-                });
+            formatted = Formatter.Format(new SqlParseResult
+            {
+                Source = sql,
+                Root = statement,
+                Tokens = lexed.Tokens,
+                Trivia = lexed.Trivia,
+            });
             formatterTime = formatWatch?.Elapsed;
         }
 

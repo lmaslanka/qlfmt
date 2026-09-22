@@ -94,6 +94,57 @@ public sealed class TraceTests
     }
 
     [Fact]
+    public void Traces_at_parameter()
+    {
+        var trace = Sql.Trace("select @id");
+
+        Assert.Equal(
+            """
+            SelectKeyword "select" @0+6
+            EmbeddedHost "@id" @7+3
+            EndOfFile "" @10+0
+            """,
+            trace.Lexer);
+        Assert.Equal(
+            """
+            SelectStatement
+              SelectKeyword "select" @0+6
+              SelectList
+                EmbeddedHostExpression "@id" @7+3
+            """,
+            trace.Parser);
+        Assert.Equal(
+            """
+            SELECT
+                @id
+            """,
+            trace.Format);
+        Assert.Null(trace.Error);
+    }
+
+    [Fact]
+    public void Traces_question_host_parameter()
+    {
+        var trace = Sql.Trace("select ?");
+
+        Assert.Equal(
+            """
+            SelectStatement
+              SelectKeyword "select" @0+6
+              SelectList
+                HostParameterExpression "?" @7+1
+            """,
+            trace.Parser);
+        Assert.Equal(
+            """
+            SELECT
+                ?
+            """,
+            trace.Format);
+        Assert.Null(trace.Error);
+    }
+
+    [Fact]
     public void Lexer_only_does_not_parse()
     {
         var trace = Sql.Trace("select a", dumpLexer: true, dumpParser: false, format: false, stats: false);

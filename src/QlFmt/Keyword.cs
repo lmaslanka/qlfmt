@@ -85,4 +85,6 @@ internal static class Keyword
     public const string OnlyUpper = "ONLY";
     public const string UpdateUpper = "UPDATE";
     public const string OfUpper = "OF";
+    public const string InsertUpper = "INSERT";
+    public const string IntoUpper = "INTO";
 }

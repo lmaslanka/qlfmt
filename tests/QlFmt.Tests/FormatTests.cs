@@ -1239,6 +1239,184 @@ public sealed class FormatTests
     }
 
     [Fact]
+    public void Formats_insert_select()
+    {
+        AssertFormatted(
+            "insert into t select 1",
+            """
+            INSERT INTO t
+            SELECT
+                1
+            """);
+    }
+
+    [Fact]
+    public void Formats_insert_select_column_list()
+    {
+        AssertFormatted(
+            "insert into t (a, b) select 1, 2",
+            """
+            INSERT INTO t (
+                a,
+                b
+            )
+            SELECT
+                1,
+                2
+            """);
+    }
+
+    [Fact]
+    public void Formats_insert_select_with_at_parameter()
+    {
+        AssertFormatted(
+            """
+            INSERT INTO activity_feed (
+                    audit_event_id,
+                    occurred_on,
+                    actor_kind,
+                    actor_user_id,
+                    actor_auth0_id,
+                    actor_display_name,
+                    subject_type,
+                    subject_record_id,
+                    subject_label,
+                    parent_subject_type,
+                    parent_subject_record_id,
+                    action
+                )
+                 SELECT record_id,
+                        occurred_on,
+                        actor_kind,
+                        actor_user_id,
+                        actor_auth0_id,
+                        actor_display_name,
+                        subject_type,
+                        subject_record_id,
+                        subject_label,
+                        parent_subject_type,
+                        parent_subject_record_id,
+                        action
+                   FROM audit_event
+                  WHERE record_id = @auditEventId;
+            """,
+            """
+            INSERT INTO activity_feed (
+                audit_event_id,
+                occurred_on,
+                actor_kind,
+                actor_user_id,
+                actor_auth0_id,
+                actor_display_name,
+                subject_type,
+                subject_record_id,
+                subject_label,
+                parent_subject_type,
+                parent_subject_record_id,
+                action
+            )
+            SELECT
+                record_id,
+                occurred_on,
+                actor_kind,
+                actor_user_id,
+                actor_auth0_id,
+                actor_display_name,
+                subject_type,
+                subject_record_id,
+                subject_label,
+                parent_subject_type,
+                parent_subject_record_id,
+                action
+            FROM audit_event
+            WHERE record_id = @auditEventId
+            """);
+    }
+
+    [Fact]
+    public void Formats_colon_host_parameter()
+    {
+        AssertFormatted(
+            "select a from t where x = :id",
+            """
+            SELECT
+                a
+            FROM t
+            WHERE x = :id
+            """);
+    }
+
+    [Fact]
+    public void Preserves_at_parameter_casing()
+    {
+        AssertFormatted(
+            "select x = @AuditEventId from t",
+            """
+            SELECT
+                x = @AuditEventId
+            FROM t
+            """);
+    }
+
+    [Fact]
+    public void Formats_question_host_parameter()
+    {
+        AssertFormatted(
+            "select a from t where x = ?",
+            """
+            SELECT
+                a
+            FROM t
+            WHERE x = ?
+            """);
+    }
+
+    [Fact]
+    public void Formats_insert_values()
+    {
+        AssertFormatted(
+            "insert into t values (1), (2)",
+            """
+            INSERT INTO t
+            VALUES
+                (1),
+                (2)
+            """);
+    }
+
+    [Fact]
+    public void Formats_insert_qualified_table()
+    {
+        AssertFormatted(
+            "insert into dbo.t (a) select 1",
+            """
+            INSERT INTO dbo.t (
+                a
+            )
+            SELECT
+                1
+            """);
+    }
+
+    [Fact]
+    public void Preserves_comments_in_insert()
+    {
+        AssertFormatted(
+            """
+            insert -- i
+            into /* tbl */ t /* cols */ (a) select 1
+            """,
+            """
+            INSERT -- i
+            INTO /* tbl */ t /* cols */ (
+                a
+            )
+            SELECT
+                1
+            """);
+    }
+
+    [Fact]
     public void Formats_comma_from()
     {
         AssertFormatted(

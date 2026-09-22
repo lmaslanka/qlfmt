@@ -30,10 +30,10 @@ internal sealed class Formatter
         _color = color;
     }
 
-    public static string Format(SqlSyntaxTree tree, bool color = false)
+    public static string Format(SqlParseResult tree, bool color = false)
     {
         var formatter = new Formatter(tree.Source, tree.Trivia, color);
-        formatter.Write(tree.Root);
+        formatter.Write(tree.Root!);
         formatter.AppendLeadingTrivia(tree.Tokens[^1]);
         return formatter._sql.ToString();
     }
@@ -56,6 +56,9 @@ internal sealed class Formatter
                 break;
             case ValuesQuery values:
                 WriteValues(values);
+                break;
+            case InsertStatement insert:
+                WriteInsert(insert);
                 break;
             default:
                 throw new InvalidOperationException($"Unknown query {query.GetType().Name}");
@@ -168,6 +171,50 @@ internal sealed class Formatter
 
         AppendLine();
         Write(setOp.Right);
+    }
+
+    private void WriteInsert(InsertStatement insert)
+    {
+        WriteKeyword(insert.InsertKeyword, Keyword.InsertUpper);
+        AppendPlain(' ');
+        WriteKeyword(insert.IntoKeyword, Keyword.IntoUpper);
+        for (var i = 0; i < insert.TableName.Count; i++)
+        {
+            if (i > 0)
+            {
+                AppendPlain('.');
+            }
+
+            WriteIdentifier(insert.TableName[i]);
+        }
+
+        if (insert.Columns is { } columns
+            && insert.ColumnOpenParen is { } open
+            && insert.ColumnCloseParen is { } close)
+        {
+            AppendLeadingTrivia(open);
+            AppendSpaceIfNeeded();
+            AppendPlain('(');
+            _indent++;
+            for (var i = 0; i < columns.Count; i++)
+            {
+                AppendLine();
+                WriteIdentifier(columns[i]);
+                if (i < columns.Count - 1)
+                {
+                    AppendPlain(',');
+                }
+            }
+
+            _indent--;
+            AppendLeadingTrivia(close);
+            AppendLine();
+            EnsureContentIndent();
+            AppendPlain(')');
+        }
+
+        AppendLine();
+        Write(insert.Query);
     }
 
     private void WriteValues(ValuesQuery values)
@@ -684,6 +731,21 @@ internal sealed class Formatter
                 WriteDataType(cast.Type);
                 AppendPlain(')');
                 break;
+            case CoalesceExpression coalesce:
+                WriteIdentifier(coalesce.CoalesceKeyword);
+                AppendPlain('(');
+                AppendCommaExpressions(coalesce.Arguments);
+                AppendPlain(')');
+                break;
+            case NullIfExpression nullIf:
+                WriteIdentifier(nullIf.NullIfKeyword);
+                AppendPlain('(');
+                AppendExpression(nullIf.First);
+                AppendPlain(',');
+                AppendPlain(' ');
+                AppendExpression(nullIf.Second);
+                AppendPlain(')');
+                break;
             case ColonCastExpression colonCast:
                 AppendExpression(colonCast.Expression);
                 AppendLeadingTrivia(colonCast.DoubleColon);
@@ -699,6 +761,18 @@ internal sealed class Formatter
                 break;
             case IdentifierExpression identifier:
                 WriteIdentifier(identifier.Identifier);
+                break;
+            case EmbeddedHostExpression host:
+                AppendLeadingTrivia(host.Name);
+                EnsureContentIndent();
+                AppendSpaceIfNeeded();
+                AppendPlain(host.Name.TextOf(_source));
+                break;
+            case HostParameterExpression parameter:
+                AppendLeadingTrivia(parameter.QuestionMark);
+                EnsureContentIndent();
+                AppendSpaceIfNeeded();
+                AppendPlain('?');
                 break;
             case NiladicFunctionExpression niladic:
                 WriteNiladic(niladic);
@@ -1176,9 +1250,9 @@ internal sealed class Formatter
     private void WriteDataType(DataType type)
     {
         WriteTypeName(type.Name);
-        if (type.SecondName is { } secondName)
+        foreach (var part in type.NameTail)
         {
-            WriteTypeName(secondName);
+            WriteTypeName(part);
         }
 
         if (type.OpenParen is not null && type.Precision is { } precision && type.CloseParen is not null)
@@ -1400,9 +1474,13 @@ internal sealed class Formatter
     {
         ArrayExpression array => array.ArrayKeyword,
         CastExpression cast => cast.CastKeyword,
+        CoalesceExpression coalesce => coalesce.CoalesceKeyword,
+        NullIfExpression nullIf => nullIf.NullIfKeyword,
         ColonCastExpression colonCast => StartToken(colonCast.Expression),
         CollateExpression collate => StartToken(collate.Expression),
         IdentifierExpression identifier => identifier.Identifier,
+        EmbeddedHostExpression host => host.Name,
+        HostParameterExpression parameter => parameter.QuestionMark,
         LiteralExpression literal => literal.Literal,
         NiladicFunctionExpression niladic => niladic.Name,
         DatetimeLiteralExpression datetime => datetime.KindKeyword,
