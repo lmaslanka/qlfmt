@@ -2513,7 +2513,7 @@ public sealed class FormatTests
     public void Rejects_bare_for()
     {
         var error = Assert.Throws<QlParse.SqlParseException>(() => Sql.Format("select a from t for"));
-        Assert.Equal("Expected READ or UPDATE", error.Message);
+        Assert.Equal("Expected READ, UPDATE, or SHARE", error.Message);
     }
 
     [Fact]
