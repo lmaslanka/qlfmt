@@ -230,7 +230,31 @@ internal sealed partial class Formatter
                     AppendPlain(' ');
                 }
 
-                WriteKeyword(isExpression.Value, IsValueText(isExpression.Value.Kind));
+                WriteTypeName(isExpression.Value);
+                if (isExpression.KindKeyword is { } kindKeyword)
+                {
+                    AppendPlain(' ');
+                    WriteTypeName(kindKeyword);
+                }
+
+                if (isExpression.UniqueWith is { } uniqueWith)
+                {
+                    AppendPlain(' ');
+                    WriteTypeName(uniqueWith);
+                }
+
+                if (isExpression.UniqueKeyword is { } uniqueKeys)
+                {
+                    AppendPlain(' ');
+                    WriteTypeName(uniqueKeys);
+                }
+
+                if (isExpression.KeysKeyword is { } keysKeyword)
+                {
+                    AppendPlain(' ');
+                    WriteTypeName(keysKeyword);
+                }
+
                 break;
             case NotExpression not:
                 WriteKeyword(not.NotKeyword, Keyword.NotUpper);
@@ -238,23 +262,7 @@ internal sealed partial class Formatter
                 AppendExpression(not.Expression);
                 break;
             case FunctionCallExpression call:
-                WriteIdentifier(call.Name);
-                AppendPlain('(');
-                AppendCommaExpressions(call.Arguments);
-                AppendPlain(')');
-                if (call.Filter is { } filter)
-                {
-                    AppendPlain(' ');
-                    WriteKeyword(filter.FilterKeyword, Keyword.FilterUpper);
-                    AppendLeadingTrivia(filter.OpenParen);
-                    AppendSpaceIfNeeded();
-                    AppendPlain('(');
-                    WriteKeyword(filter.WhereKeyword, Keyword.WhereUpper);
-                    AppendPlain(' ');
-                    AppendExpression(filter.Expression);
-                    AppendPlain(')');
-                }
-
+                WriteFunctionCall(call);
                 break;
             case RowConstructorExpression row:
                 AppendLeadingTrivia(row.OpenParen);
@@ -304,7 +312,7 @@ internal sealed partial class Formatter
                 if (match.MatchType is { } matchType)
                 {
                     AppendPlain(' ');
-                    WriteKeyword(matchType, MatchTypeText(matchType.Kind));
+                    WriteTypeName(matchType);
                 }
 
                 AppendPlain(' ');
@@ -409,6 +417,46 @@ internal sealed partial class Formatter
                 break;
             case NewSpecificationExpression created:
                 WriteNewSpecification(created);
+                break;
+            case SimilarExpression similar:
+                WriteSimilar(similar);
+                break;
+            case DistinctFromExpression distinctFrom:
+                WriteDistinctFrom(distinctFrom);
+                break;
+            case NormalizedPredicateExpression normalized:
+                WriteNormalized(normalized);
+                break;
+            case PeriodExpression period:
+                WritePeriod(period);
+                break;
+            case PeriodPredicateExpression periodPredicate:
+                WritePeriodPredicate(periodPredicate);
+                break;
+            case GroupingOperationExpression grouping:
+                WriteGroupingOperation(grouping);
+                break;
+            case EmptyGroupingSetExpression emptyGrouping:
+                AppendLeadingTrivia(emptyGrouping.OpenParen);
+                EnsureContentIndent();
+                AppendSpaceIfNeeded();
+                AppendPlain('(');
+                AppendPlain(')');
+                break;
+            case JsonAccessorExpression jsonAccessor:
+                WriteJsonAccessor(jsonAccessor);
+                break;
+            case MarkupCallExpression markup:
+                WriteMarkupCall(markup);
+                break;
+            case MdarrayConstructorExpression mdarray:
+                WriteMdarrayConstructor(mdarray);
+                break;
+            case MdarraySliceExpression slice:
+                WriteMdarraySlice(slice);
+                break;
+            case MdarrayAggregateExpression aggregate:
+                WriteMdarrayAggregate(aggregate);
                 break;
             default:
                 throw new InvalidOperationException($"Unknown expression {expression.GetType().Name}");
@@ -609,6 +657,152 @@ internal sealed partial class Formatter
         WriteQualifiedName(created.TypeName);
         AppendPlain('(');
         AppendCommaExpressions(created.Arguments);
+        AppendPlain(')');
+    }
+
+    private void WriteFunctionCall(FunctionCallExpression call)
+    {
+        WriteIdentifier(call.Name);
+        AppendPlain('(');
+        AppendCommaExpressions(call.Arguments);
+        AppendPlain(')');
+        if (call.FromKeyword is { } fromKeyword && call.FromPosition is { } fromPosition)
+        {
+            AppendPlain(' ');
+            WriteKeyword(fromKeyword, Keyword.FromUpper);
+            AppendPlain(' ');
+            WriteTypeName(fromPosition);
+        }
+
+        if (call.NullTreatment is { } nullTreatment && call.NullsKeyword is { } nullsKeyword)
+        {
+            AppendPlain(' ');
+            WriteTypeName(nullTreatment);
+            AppendPlain(' ');
+            WriteTypeName(nullsKeyword);
+        }
+
+        if (call.Filter is { } filter)
+        {
+            AppendPlain(' ');
+            WriteKeyword(filter.FilterKeyword, Keyword.FilterUpper);
+            AppendLeadingTrivia(filter.OpenParen);
+            AppendSpaceIfNeeded();
+            AppendPlain('(');
+            WriteKeyword(filter.WhereKeyword, Keyword.WhereUpper);
+            AppendPlain(' ');
+            AppendExpression(filter.Expression);
+            AppendPlain(')');
+        }
+
+        if (call.Over is { } over)
+        {
+            WriteWindowSpecification(over);
+        }
+    }
+
+    private void WriteSimilar(SimilarExpression similar)
+    {
+        AppendExpression(similar.Target);
+        AppendPlain(' ');
+        if (similar.NotKeyword is { } notSimilar)
+        {
+            WriteKeyword(notSimilar, Keyword.NotUpper);
+            AppendPlain(' ');
+        }
+
+        WriteTypeName(similar.SimilarKeyword);
+        AppendPlain(' ');
+        WriteKeyword(similar.ToKeyword, Keyword.ToUpper);
+        AppendPlain(' ');
+        AppendExpression(similar.Pattern);
+        if (similar.EscapeKeyword is { } escapeKeyword && similar.Escape is { } escape)
+        {
+            AppendPlain(' ');
+            WriteKeyword(escapeKeyword, Keyword.EscapeUpper);
+            AppendPlain(' ');
+            AppendExpression(escape);
+        }
+    }
+
+    private void WriteDistinctFrom(DistinctFromExpression distinctFrom)
+    {
+        AppendExpression(distinctFrom.Left);
+        AppendPlain(' ');
+        WriteKeyword(distinctFrom.IsKeyword, Keyword.IsUpper);
+        AppendPlain(' ');
+        if (distinctFrom.NotKeyword is { } notDistinct)
+        {
+            WriteKeyword(notDistinct, Keyword.NotUpper);
+            AppendPlain(' ');
+        }
+
+        WriteKeyword(distinctFrom.DistinctKeyword, Keyword.DistinctUpper);
+        AppendPlain(' ');
+        WriteKeyword(distinctFrom.FromKeyword, Keyword.FromUpper);
+        AppendPlain(' ');
+        AppendExpression(distinctFrom.Right);
+    }
+
+    private void WriteNormalized(NormalizedPredicateExpression normalized)
+    {
+        AppendExpression(normalized.Target);
+        AppendPlain(' ');
+        WriteKeyword(normalized.IsKeyword, Keyword.IsUpper);
+        AppendPlain(' ');
+        if (normalized.NotKeyword is { } notNormalized)
+        {
+            WriteKeyword(notNormalized, Keyword.NotUpper);
+            AppendPlain(' ');
+        }
+
+        if (normalized.Form is { } form)
+        {
+            WriteTypeName(form);
+            AppendPlain(' ');
+        }
+
+        WriteTypeName(normalized.NormalizedKeyword);
+    }
+
+    private void WritePeriod(PeriodExpression period)
+    {
+        WriteTypeName(period.PeriodKeyword);
+        AppendLeadingTrivia(period.OpenParen);
+        AppendPlain('(');
+        AppendExpression(period.Start);
+        AppendPlain(',');
+        AppendPlain(' ');
+        AppendExpression(period.End);
+        AppendPlain(')');
+    }
+
+    private void WritePeriodPredicate(PeriodPredicateExpression periodPredicate)
+    {
+        AppendExpression(periodPredicate.Left);
+        AppendPlain(' ');
+        if (periodPredicate.ImmediatelyKeyword is { } immediately)
+        {
+            WriteTypeName(immediately);
+            AppendPlain(' ');
+        }
+
+        WriteTypeName(periodPredicate.OperatorToken);
+        AppendPlain(' ');
+        AppendExpression(periodPredicate.Right);
+    }
+
+    private void WriteGroupingOperation(GroupingOperationExpression grouping)
+    {
+        WriteTypeName(grouping.Keyword);
+        if (grouping.SetsKeyword is { } setsKeyword)
+        {
+            AppendPlain(' ');
+            WriteTypeName(setsKeyword);
+        }
+
+        AppendPlain('(');
+        AppendCommaExpressions(grouping.Elements);
         AppendPlain(')');
     }
 

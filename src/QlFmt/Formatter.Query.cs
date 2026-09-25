@@ -26,6 +26,343 @@ internal sealed partial class Formatter
             case InsertStatement insert:
                 WriteInsert(insert);
                 break;
+            case UpdateStatement update:
+                WriteUpdate(update);
+                break;
+            case DeleteStatement delete:
+                WriteDelete(delete);
+                break;
+            case MergeStatement merge:
+                WriteMerge(merge);
+                break;
+            case TruncateStatement truncate:
+                WriteTruncate(truncate);
+                break;
+            case SetAssignmentStatement assignment:
+                WriteSetAssignment(assignment);
+                break;
+            case SchemaDefinition schema:
+                WriteSchemaDefinition(schema);
+                break;
+            case AlterSchemaStatement alterSchema:
+                WriteAlterSchema(alterSchema);
+                break;
+            case DropSchemaStatement dropSchema:
+                WriteDropSchema(dropSchema);
+                break;
+            case CreateTableStatement createTable:
+                WriteCreateTable(createTable);
+                break;
+            case AlterTableStatement alterTable:
+                WriteAlterTable(alterTable);
+                break;
+            case DropTableStatement dropTable:
+                WriteDropNamed(dropTable.DropKeyword, dropTable.TableKeyword, dropTable.Name, dropTable.Behavior);
+                break;
+            case CreateViewStatement createView:
+                WriteCreateView(createView);
+                break;
+            case AlterViewStatement alterView:
+                WriteAlterView(alterView);
+                break;
+            case DropViewStatement dropView:
+                WriteDropNamed(dropView.DropKeyword, dropView.ViewKeyword, dropView.Name, dropView.Behavior);
+                break;
+            case CreateDomainStatement createDomain:
+                WriteCreateDomain(createDomain);
+                break;
+            case AlterDomainStatement alterDomain:
+                WriteAlterDomain(alterDomain);
+                break;
+            case DropDomainStatement dropDomain:
+                WriteDropNamed(dropDomain.DropKeyword, dropDomain.DomainKeyword, dropDomain.Name, dropDomain.Behavior);
+                break;
+            case CreateTypeStatement createType:
+                WriteCreateType(createType);
+                break;
+            case DropTypeStatement dropType:
+                WriteDropNamed(dropType.DropKeyword, dropType.TypeKeyword, dropType.Name, dropType.Behavior);
+                break;
+            case CreateOrderingStatement createOrdering:
+                WriteCreateOrdering(createOrdering);
+                break;
+            case CreateCastStatement createCast:
+                WriteCreateCast(createCast);
+                break;
+            case CreateTransformStatement createTransform:
+                WriteCreateTransform(createTransform);
+                break;
+            case CreateAssertionStatement createAssertion:
+                WriteCreateAssertion(createAssertion);
+                break;
+            case DropAssertionStatement dropAssertion:
+                WriteDropNamed(dropAssertion.DropKeyword, dropAssertion.AssertionKeyword, dropAssertion.Name, dropAssertion.Behavior);
+                break;
+            case CreateCharacterSetStatement createCharacterSet:
+                WriteCreateCharacterSet(createCharacterSet);
+                break;
+            case DropCharacterSetStatement dropCharacterSet:
+                WriteDropCharacterSet(dropCharacterSet);
+                break;
+            case CreateCollationStatement createCollation:
+                WriteCreateCollation(createCollation);
+                break;
+            case DropCollationStatement dropCollation:
+                WriteDropNamed(dropCollation.DropKeyword, dropCollation.CollationKeyword, dropCollation.Name, dropCollation.Behavior);
+                break;
+            case CreateTranslationStatement createTranslation:
+                WriteCreateTranslation(createTranslation);
+                break;
+            case DropTranslationStatement dropTranslation:
+                WriteKw(dropTranslation.DropKeyword);
+                WriteKw(dropTranslation.TranslationKeyword);
+                WriteQualifiedName(dropTranslation.Name);
+                break;
+            case CreateSequenceStatement createSequence:
+                WriteCreateSequence(createSequence);
+                break;
+            case DropSequenceStatement dropSequence:
+                WriteDropNamed(dropSequence.DropKeyword, dropSequence.SequenceKeyword, dropSequence.Name, dropSequence.Behavior);
+                break;
+            case CreateIndexStatement createIndex:
+                WriteCreateIndex(createIndex);
+                break;
+            case AlterIndexStatement alterIndex:
+                WriteAlterIndex(alterIndex);
+                break;
+            case DropIndexStatement dropIndex:
+                WriteDropIndex(dropIndex);
+                break;
+            case CommentStatement comment:
+                WriteCommentStatement(comment);
+                break;
+            case GrantPrivilegeStatement grantPrivilege:
+                WriteGrantPrivilege(grantPrivilege);
+                break;
+            case GrantRoleStatement grantRole:
+                WriteGrantRole(grantRole);
+                break;
+            case RevokePrivilegeStatement revokePrivilege:
+                WriteRevokePrivilege(revokePrivilege);
+                break;
+            case RevokeRoleStatement revokeRole:
+                WriteRevokeRole(revokeRole);
+                break;
+            case CreateRoleStatement createRole:
+                WriteCreateRole(createRole);
+                break;
+            case DropRoleStatement dropRole:
+                WriteKw(dropRole.DropKeyword);
+                WriteKw(dropRole.RoleKeyword);
+                WriteIdentifier(dropRole.Name);
+                break;
+            case SetRoleStatement setRole:
+                WriteKw(setRole.SetKeyword);
+                WriteKw(setRole.RoleKeyword);
+                WriteLexical(setRole.Value);
+                break;
+            case StartTransactionStatement startTransaction:
+                WriteStartTransaction(startTransaction);
+                break;
+            case SetTransactionStatement setTransaction:
+                WriteSetTransaction(setTransaction);
+                break;
+            case CommitStatement commit:
+                WriteCommit(commit);
+                break;
+            case RollbackStatement rollback:
+                WriteRollback(rollback);
+                break;
+            case SavepointStatement savepoint:
+                WriteKw(savepoint.SavepointKeyword);
+                WriteIdentifier(savepoint.Name);
+                break;
+            case ReleaseSavepointStatement release:
+                WriteKw(release.ReleaseKeyword);
+                WriteKw(release.SavepointKeyword);
+                WriteIdentifier(release.Name);
+                break;
+            case SetConstraintsStatement setConstraints:
+                WriteSetConstraints(setConstraints);
+                break;
+            case SetSessionAuthorizationStatement setAuth:
+                WriteSetSessionAuthorization(setAuth);
+                break;
+            case SetSessionCharacteristicsStatement setCharacteristics:
+                WriteSetSessionCharacteristics(setCharacteristics);
+                break;
+            case SetNamesStatement setNames:
+                WriteSetNames(setNames);
+                break;
+            case SetCharacterSetStatement setCharacterSet:
+                WriteSetCharacterSet(setCharacterSet);
+                break;
+            case SetCollationStatement setCollation:
+                WriteSetCollation(setCollation);
+                break;
+            case SetTimeZoneStatement setTimeZone:
+                WriteSetTimeZone(setTimeZone);
+                break;
+            case SetCatalogStatement setCatalog:
+                WriteSetCatalog(setCatalog);
+                break;
+            case SetSchemaStatement setSchema:
+                WriteSetSchema(setSchema);
+                break;
+            case SetPathStatement setPath:
+                WriteSetPath(setPath);
+                break;
+            case ConnectStatement connect:
+                WriteConnect(connect);
+                break;
+            case DisconnectStatement disconnect:
+                WriteKw(disconnect.DisconnectKeyword);
+                WriteLexical(disconnect.Target);
+                break;
+            case SetConnectionStatement setConnection:
+                WriteKw(setConnection.SetKeyword);
+                WriteKw(setConnection.ConnectionKeyword);
+                WriteLexical(setConnection.Target);
+                break;
+            case DeclareCursorStatement declareCursor:
+                WriteDeclareCursor(declareCursor);
+                break;
+            case OpenStatement open:
+                WriteKw(open.OpenKeyword);
+                WriteIdentifier(open.Cursor);
+                break;
+            case FetchStatement fetch:
+                WriteFetchStatement(fetch);
+                break;
+            case CloseStatement close:
+                WriteKw(close.CloseKeyword);
+                WriteIdentifier(close.Cursor);
+                break;
+            case AllocateCursorStatement allocateCursor:
+                WriteAllocateCursor(allocateCursor);
+                break;
+            case DeallocateStatement deallocate:
+                WriteKw(deallocate.DeallocateKeyword);
+                WriteKw(deallocate.Kind);
+                WriteIdentifier(deallocate.Name);
+                break;
+            case PrepareStatement prepare:
+                WritePrepare(prepare);
+                break;
+            case ExecuteStatement execute:
+                WriteExecute(execute);
+                break;
+            case ExecuteImmediateStatement executeImmediate:
+                WriteKw(executeImmediate.ExecuteKeyword);
+                WriteKw(executeImmediate.ImmediateKeyword);
+                WriteLexical(executeImmediate.Source);
+                break;
+            case DescribeStatement describe:
+                WriteDescribe(describe);
+                break;
+            case DynamicDeclareCursorStatement dynamicCursor:
+                WriteDynamicDeclareCursor(dynamicCursor);
+                break;
+            case AllocateDescriptorStatement allocateDescriptor:
+                WriteAllocateDescriptor(allocateDescriptor);
+                break;
+            case GetDiagnosticsStatement diagnostics:
+                WriteGetDiagnostics(diagnostics);
+                break;
+            case SignalStatement signal:
+                WriteSignal(signal);
+                break;
+            case ResignalStatement resignal:
+                WriteResignal(resignal);
+                break;
+            case CompoundStatement compound:
+                WriteCompound(compound);
+                break;
+            case DeclareVariableStatement declareVariable:
+                WriteDeclareVariable(declareVariable);
+                break;
+            case DeclareConditionStatement declareCondition:
+                WriteDeclareCondition(declareCondition);
+                break;
+            case DeclareHandlerStatement declareHandler:
+                WriteDeclareHandler(declareHandler);
+                break;
+            case IfStatement ifStatement:
+                WriteIfStatement(ifStatement);
+                break;
+            case CaseStatement caseStatement:
+                WriteCaseStatement(caseStatement);
+                break;
+            case LoopStatement loop:
+                WriteLoop(loop);
+                break;
+            case WhileStatement whileStatement:
+                WriteWhile(whileStatement);
+                break;
+            case RepeatStatement repeat:
+                WriteRepeat(repeat);
+                break;
+            case ForStatement forStatement:
+                WriteFor(forStatement);
+                break;
+            case LeaveStatement leave:
+                WriteKw(leave.LeaveKeyword);
+                WriteIdentifier(leave.Label);
+                break;
+            case IterateStatement iterate:
+                WriteKw(iterate.IterateKeyword);
+                WriteIdentifier(iterate.Label);
+                break;
+            case CreateTriggerStatement createTrigger:
+                WriteCreateTrigger(createTrigger);
+                break;
+            case DropTriggerStatement dropTrigger:
+                WriteKw(dropTrigger.DropKeyword);
+                WriteKw(dropTrigger.TriggerKeyword);
+                WriteQualifiedName(dropTrigger.Name);
+                break;
+            case CreateRoutineStatement createRoutine:
+                WriteCreateRoutine(createRoutine);
+                break;
+            case AlterRoutineStatement alterRoutine:
+                WriteAlterRoutine(alterRoutine);
+                break;
+            case DropRoutineStatement dropRoutine:
+                WriteKw(dropRoutine.DropKeyword);
+                WriteRoutineDesignator(dropRoutine.Designator);
+                WriteKw(dropRoutine.Behavior);
+                break;
+            case CallStatement call:
+                WriteCall(call);
+                break;
+            case ReturnStatement returnStatement:
+                WriteKw(returnStatement.ReturnKeyword);
+                AppendPlain(' ');
+                AppendExpression(returnStatement.Value);
+                break;
+            case CreatePropertyGraphStatement createGraph:
+                WriteCreatePropertyGraph(createGraph);
+                break;
+            case DropPropertyGraphStatement dropGraph:
+                WriteDropPropertyGraph(dropGraph);
+                break;
+            case ModuleDefinition module:
+                WriteModule(module);
+                break;
+            case ModuleProcedure procedure:
+                WriteModuleProcedure(procedure);
+                break;
+            case EmbeddedSqlStatement embedded:
+                WriteEmbedded(embedded);
+                break;
+            case DeclareSectionStatement declareSection:
+                WriteKw(declareSection.BeginOrEnd);
+                WriteKw(declareSection.DeclareKeyword);
+                WriteKw(declareSection.SectionKeyword);
+                break;
+            case WheneverStatement whenever:
+                WriteWhenever(whenever);
+                break;
             case DirectSqlScript script:
                 WriteDirectSqlScript(script);
                 break;
@@ -60,6 +397,12 @@ internal sealed partial class Formatter
         {
             AppendPlain(' ');
             WriteKeyword(recursive, Keyword.RecursiveUpper);
+        }
+
+        if (withQuery.RecursionLimit is { } recursionLimit)
+        {
+            AppendPlain(' ');
+            WriteTypeName(recursionLimit);
         }
 
         _indent++;
@@ -102,6 +445,71 @@ internal sealed partial class Formatter
         WriteKeyword(cte.AsKeyword, Keyword.AsUpper);
         AppendPlain(' ');
         AppendSubquery(cte.OpenQuery, cte.Query, cte.CloseQuery);
+        if (cte.Search is { } search)
+        {
+            WriteSearchClause(search);
+        }
+
+        if (cte.Cycle is { } cycle)
+        {
+            WriteCycleClause(cycle);
+        }
+    }
+
+    private void WriteSearchClause(SearchClause search)
+    {
+        AppendPlain(' ');
+        WriteTypeName(search.SearchKeyword);
+        AppendPlain(' ');
+        WriteTypeName(search.OrderKeyword);
+        AppendPlain(' ');
+        WriteTypeName(search.FirstKeyword);
+        AppendPlain(' ');
+        WriteKeyword(search.ByKeyword, Keyword.ByUpper);
+        AppendPlain(' ');
+        WriteCommaIdentifiers(search.Columns);
+        AppendPlain(' ');
+        WriteTypeName(search.SetKeyword);
+        AppendPlain(' ');
+        WriteIdentifier(search.SequenceColumn);
+    }
+
+    private void WriteCycleClause(CycleClause cycle)
+    {
+        AppendPlain(' ');
+        WriteTypeName(cycle.CycleKeyword);
+        AppendPlain(' ');
+        WriteCommaIdentifiers(cycle.Columns);
+        AppendPlain(' ');
+        WriteTypeName(cycle.SetKeyword);
+        AppendPlain(' ');
+        WriteIdentifier(cycle.MarkColumn);
+        AppendPlain(' ');
+        WriteKeyword(cycle.ToKeyword, Keyword.ToUpper);
+        AppendPlain(' ');
+        AppendExpression(cycle.MarkValue);
+        AppendPlain(' ');
+        WriteTypeName(cycle.DefaultKeyword);
+        AppendPlain(' ');
+        AppendExpression(cycle.DefaultValue);
+        AppendPlain(' ');
+        WriteKeyword(cycle.UsingKeyword, Keyword.UsingUpper);
+        AppendPlain(' ');
+        WriteIdentifier(cycle.PathColumn);
+    }
+
+    private void WriteCommaIdentifiers(IReadOnlyList<SyntaxToken> names)
+    {
+        for (var i = 0; i < names.Count; i++)
+        {
+            if (i > 0)
+            {
+                AppendPlain(',');
+                AppendPlain(' ');
+            }
+
+            WriteIdentifier(names[i]);
+        }
     }
 
     private void WriteParenQuery(ParenQuery paren)
@@ -161,50 +569,6 @@ internal sealed partial class Formatter
         Write(setOp.Right);
     }
 
-    private void WriteInsert(InsertStatement insert)
-    {
-        WriteKeyword(insert.InsertKeyword, Keyword.InsertUpper);
-        AppendPlain(' ');
-        WriteKeyword(insert.IntoKeyword, Keyword.IntoUpper);
-        for (var i = 0; i < insert.TableName.Count; i++)
-        {
-            if (i > 0)
-            {
-                AppendPlain('.');
-            }
-
-            WriteIdentifier(insert.TableName[i]);
-        }
-
-        if (insert.Columns is { } columns
-            && insert.ColumnOpenParen is { } open
-            && insert.ColumnCloseParen is { } close)
-        {
-            AppendLeadingTrivia(open);
-            AppendSpaceIfNeeded();
-            AppendPlain('(');
-            _indent++;
-            for (var i = 0; i < columns.Count; i++)
-            {
-                AppendLine();
-                WriteIdentifier(columns[i]);
-                if (i < columns.Count - 1)
-                {
-                    AppendPlain(',');
-                }
-            }
-
-            _indent--;
-            AppendLeadingTrivia(close);
-            AppendLine();
-            EnsureContentIndent();
-            AppendPlain(')');
-        }
-
-        AppendLine();
-        Write(insert.Query);
-    }
-
     private void WriteValues(ValuesQuery values)
     {
         WriteKeyword(values.ValuesKeyword, Keyword.ValuesUpper);
@@ -258,6 +622,24 @@ internal sealed partial class Formatter
         }
 
         _indent--;
+        if (statement.IntoKeyword is { } intoKeyword && statement.IntoTargets is { } intoTargets)
+        {
+            AppendLeadingTrivia(intoKeyword);
+            AppendLine();
+            WriteKeyword(intoKeyword, Keyword.IntoUpper);
+            AppendPlain(' ');
+            for (var i = 0; i < intoTargets.Count; i++)
+            {
+                if (i > 0)
+                {
+                    AppendPlain(',');
+                    AppendPlain(' ');
+                }
+
+                WriteIntoTarget(intoTargets[i]);
+            }
+        }
+
         if (statement.FromKeyword is { } fromKeyword && statement.From is { } from)
         {
             AppendLeadingTrivia(fromKeyword);
@@ -313,32 +695,14 @@ internal sealed partial class Formatter
             AppendWhereExpression(statement.Having.Expression);
         }
 
+        if (statement.Window is { } window)
+        {
+            WriteWindowClause(window);
+        }
+
         if (statement.OrderBy is not null)
         {
-            AppendLeadingTrivia(statement.OrderBy.OrderKeyword);
-            AppendLine();
-            WriteKeyword(statement.OrderBy.OrderKeyword, Keyword.OrderUpper);
-            AppendPlain(' ');
-            WriteKeyword(statement.OrderBy.ByKeyword, Keyword.ByUpper);
-            AppendPlain(' ');
-            for (var i = 0; i < statement.OrderBy.Items.Count; i++)
-            {
-                if (i > 0)
-                {
-                    AppendPlain(',');
-                    AppendPlain(' ');
-                }
-
-                var item = statement.OrderBy.Items[i];
-                AppendExpression(item.Expression);
-                if (item.Direction is { } direction)
-                {
-                    AppendPlain(' ');
-                    WriteKeyword(
-                        direction,
-                        direction.Kind == SyntaxKind.DescKeyword ? Keyword.DescUpper : Keyword.AscUpper);
-                }
-            }
+            WriteOrderByClause(statement.OrderBy, newLine: true);
         }
 
         if (statement.Limit is not null)
@@ -352,11 +716,12 @@ internal sealed partial class Formatter
 
         if (statement.Offset is not null)
         {
-            AppendLeadingTrivia(statement.Offset.OffsetKeyword);
-            AppendLine();
-            WriteKeyword(statement.Offset.OffsetKeyword, Keyword.OffsetUpper);
-            AppendPlain(' ');
-            AppendExpression(statement.Offset.Count);
+            WriteOffsetClause(statement.Offset);
+        }
+
+        if (statement.Fetch is { } fetch)
+        {
+            WriteFetchClause(fetch);
         }
 
         if (statement.Lock is { } lockClause)
@@ -385,6 +750,12 @@ internal sealed partial class Formatter
             WriteKeyword(updateKeyword, Keyword.UpdateUpper);
         }
 
+        if (lockClause.ShareKeyword is { } shareKeyword)
+        {
+            AppendPlain(' ');
+            WriteTypeName(shareKeyword);
+        }
+
         if (lockClause.OfKeyword is { } ofKeyword && lockClause.Columns is { } columns)
         {
             AppendPlain(' ');
@@ -400,6 +771,118 @@ internal sealed partial class Formatter
 
                 WriteIdentifier(columns[i]);
             }
+        }
+    }
+
+    private void WriteIntoTarget(SyntaxToken token)
+    {
+        if (token.Kind == SyntaxKind.QuestionMark)
+        {
+            AppendLeadingTrivia(token);
+            EnsureContentIndent();
+            AppendSpaceIfNeeded();
+            AppendPlain('?');
+            return;
+        }
+
+        if (token.Kind == SyntaxKind.EmbeddedHost)
+        {
+            AppendLeadingTrivia(token);
+            EnsureContentIndent();
+            AppendSpaceIfNeeded();
+            AppendPlain(token.TextOf(_source));
+            return;
+        }
+
+        WriteIdentifier(token);
+    }
+
+    private void WriteOrderByClause(OrderByClause orderBy, bool newLine)
+    {
+        if (newLine)
+        {
+            AppendLeadingTrivia(orderBy.OrderKeyword);
+            AppendLine();
+        }
+
+        WriteKeyword(orderBy.OrderKeyword, Keyword.OrderUpper);
+        AppendPlain(' ');
+        WriteKeyword(orderBy.ByKeyword, Keyword.ByUpper);
+        AppendPlain(' ');
+        WriteOrderByItems(orderBy.Items);
+    }
+
+    private void WriteOrderByItems(IReadOnlyList<OrderByItem> items)
+    {
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (i > 0)
+            {
+                AppendPlain(',');
+                AppendPlain(' ');
+            }
+
+            var item = items[i];
+            AppendExpression(item.Expression);
+            if (item.Direction is { } direction)
+            {
+                AppendPlain(' ');
+                WriteKeyword(
+                    direction,
+                    direction.Kind == SyntaxKind.DescKeyword ? Keyword.DescUpper : Keyword.AscUpper);
+            }
+
+            if (item.NullsKeyword is { } nullsKeyword && item.NullOrder is { } nullOrder)
+            {
+                AppendPlain(' ');
+                WriteTypeName(nullsKeyword);
+                AppendPlain(' ');
+                WriteTypeName(nullOrder);
+            }
+        }
+    }
+
+    private void WriteOffsetClause(OffsetClause offset)
+    {
+        AppendLeadingTrivia(offset.OffsetKeyword);
+        AppendLine();
+        WriteKeyword(offset.OffsetKeyword, Keyword.OffsetUpper);
+        AppendPlain(' ');
+        AppendExpression(offset.Count);
+        if (offset.RowKeyword is { } rowKeyword)
+        {
+            AppendPlain(' ');
+            WriteTypeName(rowKeyword);
+        }
+    }
+
+    private void WriteFetchClause(FetchClause fetch)
+    {
+        AppendLeadingTrivia(fetch.FetchKeyword);
+        AppendLine();
+        WriteTypeName(fetch.FetchKeyword);
+        AppendPlain(' ');
+        WriteTypeName(fetch.PositionKeyword);
+        if (fetch.Count is { } count)
+        {
+            AppendPlain(' ');
+            AppendExpression(count);
+        }
+
+        if (fetch.PercentKeyword is { } percent)
+        {
+            AppendPlain(' ');
+            WriteTypeName(percent);
+        }
+
+        AppendPlain(' ');
+        WriteTypeName(fetch.RowKeyword);
+        AppendPlain(' ');
+        WriteTypeName(fetch.OnlyOrWith);
+        if (fetch.TiesKeyword is { } ties)
+        {
+            AppendPlain(' ');
+            WriteTypeName(ties);
         }
     }
 
@@ -497,22 +980,6 @@ internal sealed partial class Formatter
         _ => throw new InvalidOperationException($"Unknown quantifier {kind}"),
     };
 
-    private static string IsValueText(SyntaxKind kind) => kind switch
-    {
-        SyntaxKind.NullKeyword => Keyword.NullUpper,
-        SyntaxKind.TrueKeyword => Keyword.TrueUpper,
-        SyntaxKind.FalseKeyword => Keyword.FalseUpper,
-        SyntaxKind.UnknownKeyword => Keyword.UnknownUpper,
-        _ => throw new InvalidOperationException($"Unknown IS value {kind}"),
-    };
-
-    private static string MatchTypeText(SyntaxKind kind) => kind switch
-    {
-        SyntaxKind.PartialKeyword => Keyword.PartialUpper,
-        SyntaxKind.FullKeyword => Keyword.FullUpper,
-        _ => throw new InvalidOperationException($"Unknown match type {kind}"),
-    };
-
     private static string JoinTypeText(SyntaxKind kind) => kind switch
     {
         SyntaxKind.InnerKeyword => Keyword.InnerUpper,
@@ -537,6 +1004,30 @@ internal sealed partial class Formatter
             case JoinedTable joined:
                 AppendJoinedTable(joined);
                 break;
+            case OnlyTable only:
+                AppendOnlyTable(only);
+                break;
+            case UnnestTable unnest:
+                AppendUnnestTable(unnest);
+                break;
+            case TableFunction function:
+                AppendTableFunction(function);
+                break;
+            case SampledTable sampled:
+                AppendSampledTable(sampled);
+                break;
+            case MarkupTable markup:
+                AppendMarkupTable(markup);
+                break;
+            case MatchRecognizeTable matchRecognize:
+                AppendMatchRecognize(matchRecognize);
+                break;
+            case PtfTable ptf:
+                AppendPtfTable(ptf);
+                break;
+            case GraphTable graph:
+                AppendGraphTable(graph);
+                break;
             default:
                 throw new InvalidOperationException($"Unknown table {table.GetType().Name}");
         }
@@ -556,13 +1047,141 @@ internal sealed partial class Formatter
 
         AppendTableAlias(table.AsKeyword, table.Alias);
         AppendCorrelationColumns(table.ColumnOpenParen, table.Columns, table.ColumnCloseParen);
+        WriteSystemTime(table.SystemTime);
     }
 
     private void AppendDerivedTable(DerivedTable table)
     {
+        if (table.LateralKeyword is { } lateral)
+        {
+            WriteTypeName(lateral);
+            AppendPlain(' ');
+        }
+
         AppendSubquery(table.OpenParen, table.Query, table.CloseParen);
         AppendTableAlias(table.AsKeyword, table.Alias);
         AppendCorrelationColumns(table.ColumnOpenParen, table.Columns, table.ColumnCloseParen);
+    }
+
+    private void AppendOnlyTable(OnlyTable table)
+    {
+        WriteKeyword(table.OnlyKeyword, Keyword.OnlyUpper);
+        AppendLeadingTrivia(table.OpenParen);
+        AppendSpaceIfNeeded();
+        AppendPlain('(');
+        WriteQualifiedName(table.NameParts);
+        AppendPlain(')');
+        AppendTableAlias(table.AsKeyword, table.Alias);
+        AppendCorrelationColumns(table.ColumnOpenParen, table.Columns, table.ColumnCloseParen);
+        WriteSystemTime(table.SystemTime);
+    }
+
+    private void WriteSystemTime(SystemTimeClause? systemTime)
+    {
+        if (systemTime is null)
+        {
+            return;
+        }
+
+        WriteKw(systemTime.ForKeyword);
+        WriteKw(systemTime.SystemTimeKeyword);
+        WriteKw(systemTime.AsKeyword);
+        WriteKw(systemTime.OfKeyword);
+        if (systemTime.Point is { } point)
+        {
+            AppendPlain(' ');
+            AppendExpression(point);
+        }
+
+        WriteKw(systemTime.BetweenKeyword);
+        WriteKw(systemTime.Qualifier);
+        WriteKw(systemTime.FromKeyword);
+        if (systemTime.Start is { } start)
+        {
+            AppendPlain(' ');
+            AppendExpression(start);
+        }
+
+        WriteKw(systemTime.AndKeyword);
+        WriteKw(systemTime.ToKeyword);
+        if (systemTime.End is { } end)
+        {
+            AppendPlain(' ');
+            AppendExpression(end);
+        }
+
+        WriteKw(systemTime.AllKeyword);
+    }
+
+    private void AppendUnnestTable(UnnestTable table)
+    {
+        WriteTypeName(table.UnnestKeyword);
+        AppendPlain('(');
+        AppendCommaExpressions(table.Expressions);
+        AppendPlain(')');
+        if (table.WithKeyword is { } withKeyword && table.OrdinalityKeyword is { } ordinality)
+        {
+            AppendPlain(' ');
+            WriteKeyword(withKeyword, Keyword.WithUpper);
+            AppendPlain(' ');
+            WriteTypeName(ordinality);
+        }
+
+        AppendTableAlias(table.AsKeyword, table.Alias);
+        AppendCorrelationColumns(table.ColumnOpenParen, table.Columns, table.ColumnCloseParen);
+    }
+
+    private void AppendTableFunction(TableFunction table)
+    {
+        if (table.TableKeyword is { } tableKeyword)
+        {
+            WriteTypeName(tableKeyword);
+        }
+        else
+        {
+            WriteQualifiedName(table.NameParts);
+        }
+
+        if (table.Query is { } query)
+        {
+            AppendSubqueryCall(table.OpenParen, query, table.CloseParen);
+        }
+        else
+        {
+            AppendLeadingTrivia(table.OpenParen);
+            AppendPlain('(');
+            AppendCommaExpressions(table.Arguments);
+            AppendPlain(')');
+        }
+
+        AppendTableAlias(table.AsKeyword, table.Alias);
+        AppendCorrelationColumns(table.ColumnOpenParen, table.Columns, table.ColumnCloseParen);
+    }
+
+    private void AppendSampledTable(SampledTable table)
+    {
+        AppendTable(table.Table);
+        AppendPlain(' ');
+        WriteTypeName(table.TablesampleKeyword);
+        AppendPlain(' ');
+        WriteTypeName(table.Method);
+        AppendLeadingTrivia(table.OpenParen);
+        AppendSpaceIfNeeded();
+        AppendPlain('(');
+        AppendExpression(table.Percentage);
+        AppendPlain(')');
+        if (table.RepeatableKeyword is { } repeatable
+            && table.RepeatOpenParen is { } repeatOpen
+            && table.RepeatArgument is { } repeatArgument)
+        {
+            AppendPlain(' ');
+            WriteTypeName(repeatable);
+            AppendLeadingTrivia(repeatOpen);
+            AppendSpaceIfNeeded();
+            AppendPlain('(');
+            AppendExpression(repeatArgument);
+            AppendPlain(')');
+        }
     }
 
     private void AppendJoinedTable(JoinedTable table)

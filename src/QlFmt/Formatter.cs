@@ -57,6 +57,47 @@ internal sealed partial class Formatter
         }
     }
 
+    private void WriteKw(SyntaxToken? token)
+    {
+        if (token is { } value)
+        {
+            WriteTypeName(value);
+        }
+    }
+
+    private void WriteInsertedKeyword(string text)
+    {
+        AppendSpaceIfNeeded();
+        AppendColored(Ansi.Keyword, text);
+    }
+
+    private void WriteLexical(SyntaxToken token)
+    {
+        switch (token.Kind)
+        {
+            case SyntaxKind.Identifier:
+            case SyntaxKind.EmbeddedHost:
+                WriteIdentifier(token);
+                break;
+            case SyntaxKind.String:
+            case SyntaxKind.Number:
+                AppendLeadingTrivia(token);
+                EnsureContentIndent();
+                AppendSpaceIfNeeded();
+                AppendLiteral(token);
+                break;
+            case SyntaxKind.QuestionMark:
+                AppendLeadingTrivia(token);
+                EnsureContentIndent();
+                AppendSpaceIfNeeded();
+                AppendPlain('?');
+                break;
+            default:
+                WriteTypeName(token);
+                break;
+        }
+    }
+
     private void WriteTypeName(SyntaxToken token)
     {
         AppendLeadingTrivia(token);
@@ -302,6 +343,18 @@ internal sealed partial class Formatter
         MethodInvocationExpression method => method.OpenParen ?? StartToken(method.Target),
         StaticMethodInvocationExpression staticMethod => StartToken(staticMethod.Type),
         NewSpecificationExpression created => created.NewKeyword,
+        SimilarExpression similar => StartToken(similar.Target),
+        DistinctFromExpression distinctFrom => StartToken(distinctFrom.Left),
+        NormalizedPredicateExpression normalized => StartToken(normalized.Target),
+        PeriodExpression period => period.PeriodKeyword,
+        PeriodPredicateExpression periodPredicate => StartToken(periodPredicate.Left),
+        GroupingOperationExpression grouping => grouping.Keyword,
+        EmptyGroupingSetExpression emptyGrouping => emptyGrouping.OpenParen,
+        JsonAccessorExpression jsonAccessor => StartToken(jsonAccessor.Target),
+        MarkupCallExpression markup => markup.Name,
+        MdarrayConstructorExpression mdarray => mdarray.MdarrayKeyword,
+        MdarraySliceExpression slice => StartToken(slice.Target),
+        MdarrayAggregateExpression aggregate => aggregate.Name,
         _ => throw new InvalidOperationException($"Unknown expression {expression.GetType().Name}"),
     };
 
